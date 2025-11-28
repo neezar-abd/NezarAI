@@ -23,9 +23,11 @@ export default function RootLayout({
   return (
     <html lang="id" className="dark" suppressHydrationWarning>
       <body
-        className={`${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        className={`${geistMono.variable} antialiased bg-[#0a0a0a] text-[var(--foreground)]`}
       >
-        {children}
+        <div className="page-loaded">
+          {children}
+        </div>
       </body>
     </html>
   );

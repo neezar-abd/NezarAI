@@ -247,7 +247,7 @@ export function ChatInput({
   const canSend = (message.trim() || hasAttachments) && attachedFiles.every((f) => !f.isProcessing);
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4">
+    <div className="w-full max-w-3xl mx-auto px-2 sm:px-4">
       {/* Hidden file inputs */}
       <input
         type="file"
@@ -329,7 +329,7 @@ export function ChatInput({
         )}
 
         {/* Input Area */}
-        <div className="px-4 pt-4 pb-2">
+        <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-2">
           <textarea
             ref={textareaRef}
             value={message}
@@ -338,15 +338,15 @@ export function ChatInput({
             placeholder={hasAttachments ? "Tambahkan pesan..." : placeholder}
             disabled={isLoading}
             rows={1}
-            className="w-full bg-transparent text-[var(--foreground)] placeholder-[var(--text-muted)] resize-none outline-none text-base leading-6"
+            className="w-full bg-transparent text-[var(--foreground)] placeholder-[var(--text-muted)] resize-none outline-none text-sm sm:text-base leading-6"
             style={{ minHeight: "24px", maxHeight: "200px" }}
           />
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex items-center justify-between px-2 pb-2">
+        <div className="flex items-center justify-between px-1 sm:px-2 pb-2">
           {/* Left Actions */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1">
             {/* Attachment Menu */}
             <div className="relative">
               <button
@@ -393,27 +393,27 @@ export function ChatInput({
             <button
               type="button"
               onClick={() => setShowTemplates(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
               title="Prompt Templates"
             >
               <BookTemplate className="w-4 h-4 text-[var(--text-secondary)]" />
-              <span className="text-sm text-[var(--text-secondary)]">Templates</span>
+              <span className="text-sm text-[var(--text-secondary)] hidden sm:inline">Templates</span>
             </button>
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1">
             {/* Model Selector */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
               >
-                <span className="text-sm text-[var(--text-secondary)]">
+                <span className="text-xs sm:text-sm text-[var(--text-secondary)]">
                   {selectedModel}
                 </span>
-                <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
               </button>
 
               {/* Dropdown Menu */}

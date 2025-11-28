@@ -16,7 +16,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Plan, PlanType, plans } from "@/lib/plans";
-import { User as UserType } from "@/hooks/useAuth";
+import { User as LocalUser } from "@/hooks/useAuth";
+import { UserProfile as FirebaseUser } from "@/hooks/useFirebaseAuth";
+
+// Unified user type
+type UnifiedUser = LocalUser | FirebaseUser;
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -27,7 +31,7 @@ interface SettingsModalProps {
   userName?: string;
   remainingRequests: number | "unlimited";
   // Auth props
-  user?: UserType | null;
+  user?: UnifiedUser | null;
   isAuthenticated?: boolean;
   onLogout?: () => void;
   onOpenAuth?: () => void;
@@ -53,7 +57,15 @@ export function SettingsModal({
 
   if (!isOpen) return null;
 
-  const displayName = user?.username || userName;
+  // Helper to get display name from different user types
+  const getDisplayName = (): string => {
+    if (!user) return userName;
+    if ('username' in user && user.username) return user.username;
+    if ('displayName' in user && user.displayName) return user.displayName;
+    return userName;
+  };
+
+  const displayName = getDisplayName();
 
   const handleActivate = () => {
     setActivationError(null);

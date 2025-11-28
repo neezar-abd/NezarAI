@@ -1,0 +1,599 @@
+"use client";
+
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useChat } from "@ai-sdk/react";
+import { Pin, Settings } from "lucide-react";
+import { Sidebar, Conversation } from "@/components/sidebar/Sidebar";
+import { ChatInput, AttachedImage, AttachedFile } from "@/components/chat/ChatInput";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import { PersonaSelector } from "@/components/chat/PersonaSelector";
+import { FollowUpSuggestions } from "@/components/chat/FollowUpSuggestions";
+import { ContextPinning, usePinnedContexts } from "@/components/chat/ContextPinning";
+import { PromptTemplates } from "@/components/chat/PromptTemplates";
+import { RateLimitWarning, RequestCounter } from "@/components/chat/RateLimitWarning";
+import { SettingsModal } from "@/components/settings/SettingsModal";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { generateId, parseFollowUpSuggestions, cn } from "@/lib/utils";
+import { Persona, defaultPersona } from "@/lib/personas";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { useChatStorage } from "@/hooks/useChatStorage";
+import { useAuth } from "@/hooks/useAuth";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import { useFirestoreStorage } from "@/hooks/useFirestoreStorage";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+
+// Store images separately (not in useChat messages)
+interface MessageImages {
+  [messageId: string]: AttachedImage[];
+}
+
+export default function ChatPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed on mobile
+  const [activeConversationId, setActiveConversationId] = useState<string>();
+  const [selectedPersona, setSelectedPersona] = useState<Persona>(defaultPersona);
+  const [showContextPinning, setShowContextPinning] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [messageImages, setMessageImages] = useState<MessageImages>({});
+  const [pendingImages, setPendingImages] = useState<AttachedImage[]>([]);
+  const [rateLimitWarning, setRateLimitWarning] = useState<{ show: boolean; waitTime: number }>({
+    show: false,
+    waitTime: 0,
+  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auth - Local (fallback) and Firebase
+  const localAuth = useAuth();
+  const firebaseAuth = useFirebaseAuth();
+
+  // Use Firebase if configured, otherwise fall back to local auth
+  const isFirebaseConfigured = firebaseAuth.isConfigured;
+  const user = isFirebaseConfigured ? firebaseAuth.user : localAuth.user;
+  const isAuthenticated = isFirebaseConfigured ? firebaseAuth.isAuthenticated : localAuth.isAuthenticated;
+  const authLoading = isFirebaseConfigured ? firebaseAuth.isLoading : localAuth.isLoading;
+
+  // Helper to get user display name
+  const getUserDisplayName = (): string => {
+    if (!user) return "Kamu";
+    // Check for local auth user (has username)
+    if ('username' in user && user.username) return user.username;
+    // Check for Firebase user (has displayName)
+    if ('displayName' in user && user.displayName) return user.displayName;
+    return "Kamu";
+  };
+
+  // Helper to get user initial
+  const getUserInitial = (): string => {
+    const name = getUserDisplayName();
+    return name.charAt(0).toUpperCase();
+  };
+
+  // Firestore Storage (for Firebase users)
+  const firestoreStorage = useFirestoreStorage(firebaseAuth.user?.uid || null);
+
+  // Context Pinning
+  const { pinnedContexts, setPinnedContexts, getContextString } = usePinnedContexts();
+
+  // Chat Storage (localStorage persistence)
+  const {
+    conversations: storedConversations,
+    isLoaded: storageLoaded,
+    createConversation,
+    updateConversation,
+    renameConversation,
+    deleteConversation,
+    getConversation,
+  } = useChatStorage();
+
+  // User Plan & Rate Limiting
+  const {
+    currentPlan,
+    isLoaded: planLoaded,
+    activatePlan,
+    resetToFree,
+    checkRateLimit,
+    recordRequest,
+    getRemainingRequests,
+  } = useUserPlan();
+
+  const { messages, append, isLoading, stop, setMessages, reload } = useChat({
+    api: "/api/chat",
+    body: {
+      personaId: selectedPersona.id,
+      pinnedContext: getContextString(),
+    },
+    onFinish: (message) => {
+      // Save to storage when AI finishes responding
+      if (activeConversationId) {
+        const currentMsgs = [...messages, message];
+        updateConversation(activeConversationId, currentMsgs);
+      }
+    },
+  });
+
+  // Convert stored conversations to sidebar format
+  const sidebarConversations: Conversation[] = useMemo(() => {
+    return storedConversations.map((conv) => ({
+      id: conv.id,
+      title: conv.title,
+      updatedAt: new Date(conv.updatedAt),
+    }));
+  }, [storedConversations]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Create new conversation when first message is sent
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].role === "user" && !activeConversationId) {
+      const newId = generateId();
+      const title = messages[0].content.slice(0, 50);
+      createConversation(newId, title, messages, selectedPersona.id);
+      setActiveConversationId(newId);
+    }
+  }, [messages, activeConversationId, createConversation, selectedPersona.id]);
+
+  // Update storage when messages change (for user messages)
+  useEffect(() => {
+    if (activeConversationId && messages.length > 0 && !isLoading) {
+      updateConversation(activeConversationId, messages);
+    }
+  }, [messages, activeConversationId, isLoading, updateConversation]);
+
+  const handleNewChat = useCallback(() => {
+    setMessages([]);
+    setActiveConversationId(undefined);
+  }, [setMessages]);
+
+  const handleSelectConversation = useCallback((id: string) => {
+    const conv = getConversation(id);
+    if (conv) {
+      setMessages(conv.messages);
+      setActiveConversationId(id);
+    }
+  }, [getConversation, setMessages]);
+
+  const handleRenameConversation = useCallback((id: string, newTitle: string) => {
+    renameConversation(id, newTitle);
+  }, [renameConversation]);
+
+  const handleDeleteConversation = useCallback((id: string) => {
+    deleteConversation(id);
+    if (activeConversationId === id) {
+      setMessages([]);
+      setActiveConversationId(undefined);
+    }
+  }, [deleteConversation, activeConversationId, setMessages]);
+
+  const handleSendMessage = useCallback((content: string, images?: AttachedImage[], files?: AttachedFile[]) => {
+    // Check rate limit before sending
+    const rateLimitCheck = checkRateLimit();
+    
+    if (!rateLimitCheck.allowed) {
+      setRateLimitWarning({
+        show: true,
+        waitTime: rateLimitCheck.waitTime || 60,
+      });
+      
+      // Auto-hide warning after wait time
+      setTimeout(() => {
+        setRateLimitWarning({ show: false, waitTime: 0 });
+      }, (rateLimitCheck.waitTime || 60) * 1000);
+      
+      return;
+    }
+
+    // Record the request
+    recordRequest();
+    
+    // Store images for the pending message if any
+    if (images && images.length > 0) {
+      setPendingImages(images);
+    }
+    
+    // Build message content for display
+    let displayContent = content;
+    
+    // Add file contents to the message
+    if (files && files.length > 0) {
+      const fileContents = files
+        .filter(f => f.processed && !f.processed.error)
+        .map(f => f.processed!.content)
+        .join("\n\n");
+      
+      if (fileContents) {
+        displayContent = displayContent 
+          ? `${displayContent}\n\n---\n\n${fileContents}`
+          : fileContents;
+      }
+    }
+    
+    // Build API message content (with base64 images for vision)
+    let apiContent: any = displayContent;
+    
+    if (images && images.length > 0) {
+      apiContent = [
+        { type: "text", text: content || "Jelaskan gambar ini" },
+        ...images.map(img => ({
+          type: "image",
+          image: img.base64,
+        })),
+      ];
+    }
+    
+    append({
+      role: "user",
+      content: apiContent,
+    });
+  }, [checkRateLimit, recordRequest, append]);
+
+  // Edit message handler
+  const handleEditMessage = useCallback((messageId: string, newContent: string) => {
+    const messageIndex = messages.findIndex(m => m.id === messageId);
+    if (messageIndex === -1) return;
+
+    // Remove all messages after the edited one
+    const newMessages = messages.slice(0, messageIndex);
+    setMessages(newMessages);
+
+    // Re-send the edited message
+    setTimeout(() => {
+      handleSendMessage(newContent);
+    }, 100);
+  }, [messages, setMessages, handleSendMessage]);
+
+  // Regenerate response handler
+  const handleRegenerate = useCallback((messageId: string) => {
+    // Find the message before this assistant message (should be user message)
+    const messageIndex = messages.findIndex(m => m.id === messageId);
+    if (messageIndex <= 0) return;
+
+    // Get the user message that triggered this response
+    const userMessage = messages[messageIndex - 1];
+    if (userMessage.role !== "user") return;
+
+    // Remove the assistant message
+    const newMessages = messages.slice(0, messageIndex);
+    setMessages(newMessages);
+
+    // Reload will regenerate from the last user message
+    setTimeout(() => {
+      reload();
+    }, 100);
+  }, [messages, setMessages, reload]);
+
+  const hasMessages = messages.length > 0;
+
+  // Parse suggestions from the last assistant message
+  const { processedMessages, suggestions } = useMemo(() => {
+    if (messages.length === 0) {
+      return { processedMessages: [], suggestions: [] };
+    }
+
+    const processed = messages.map((msg) => {
+      if (msg.role === "assistant" && msg.content) {
+        const { cleanContent } = parseFollowUpSuggestions(msg.content as string);
+        return { ...msg, content: cleanContent };
+      }
+      return { ...msg, content: (msg.content as string) || "" };
+    });
+
+    // Get suggestions from last assistant message
+    const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant" && m.content);
+    const lastSuggestions = lastAssistantMsg
+      ? parseFollowUpSuggestions(lastAssistantMsg.content as string).suggestions
+      : [];
+
+    return { processedMessages: processed, suggestions: lastSuggestions };
+  }, [messages]);
+
+  const handleFollowUpSelect = (suggestion: string) => {
+    handleSendMessage(suggestion);
+  };
+
+  // Unified login handler
+  const handleLogin = async (email: string, password: string) => {
+    if (isFirebaseConfigured) {
+      return firebaseAuth.signInWithEmail(email, password);
+    }
+    return localAuth.login(email, password);
+  };
+
+  // Unified register handler
+  const handleRegister = async (username: string, email: string, password: string) => {
+    if (isFirebaseConfigured) {
+      return firebaseAuth.registerWithEmail(email, password, username);
+    }
+    return localAuth.register(username, email, password);
+  };
+
+  // Unified logout handler
+  const handleLogout = () => {
+    if (isFirebaseConfigured) {
+      firebaseAuth.logout();
+    } else {
+      localAuth.logout();
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-[var(--background)]">
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        onGoogleSignIn={firebaseAuth.signInWithGoogle}
+        isGoogleLoading={firebaseAuth.isLoading}
+        firebaseConfigured={isFirebaseConfigured}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        currentPlan={currentPlan}
+        onActivate={activatePlan}
+        onResetToFree={resetToFree}
+        remainingRequests={getRemainingRequests()}
+        user={user}
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
+        onOpenAuth={() => setShowAuthModal(true)}
+      />
+
+      {/* Rate Limit Warning */}
+      {rateLimitWarning.show && (
+        <RateLimitWarning
+          waitTime={rateLimitWarning.waitTime}
+          planName={currentPlan.name}
+          onUpgrade={() => {
+            setRateLimitWarning({ show: false, waitTime: 0 });
+            setShowSettings(true);
+          }}
+        />
+      )}
+
+      {/* Prompt Templates Modal */}
+      <PromptTemplates
+        isOpen={showTemplates}
+        onClose={() => setShowTemplates(false)}
+        onSelect={(prompt) => {
+          handleSendMessage(prompt);
+          setShowTemplates(false);
+        }}
+      />
+
+      {/* Context Pinning Modal */}
+      <ContextPinning
+        isOpen={showContextPinning}
+        onClose={() => setShowContextPinning(false)}
+        pinnedContexts={pinnedContexts}
+        onUpdate={setPinnedContexts}
+      />
+
+      {/* Sidebar */}
+      <Sidebar
+        conversations={sidebarConversations}
+        activeId={activeConversationId}
+        onSelect={handleSelectConversation}
+        onNewChat={handleNewChat}
+        onRename={handleRenameConversation}
+        onDelete={handleDeleteConversation}
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        userName={getUserDisplayName()}
+        onOpenSettings={() => setShowSettings(true)}
+      />
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="h-14 flex items-center justify-between px-2 sm:px-4 border-b border-[var(--border)] gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Sidebar Toggle Button - Desktop (when sidebar is closed) */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className={cn(
+                "p-2 rounded-lg hover:bg-[var(--surface)] text-[var(--text-secondary)] transition-colors",
+                sidebarOpen ? "lg:hidden" : ""
+              )}
+              title="Menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <h1 className="text-base sm:text-lg font-medium text-[var(--foreground)] truncate">NezarAI</h1>
+            {/* Desktop Persona Selector - Hidden on mobile */}
+            <div className="hidden sm:block">
+              <PersonaSelector
+                selectedPersona={selectedPersona}
+                onSelect={setSelectedPersona}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Request Counter - Hidden on very small screens */}
+            <div className="hidden sm:block">
+              <RequestCounter
+                remaining={getRemainingRequests()}
+                total={currentPlan.requestsPerMinute === -1 ? "unlimited" : currentPlan.requestsPerMinute}
+                planBadge={currentPlan.badge}
+                badgeColor={currentPlan.badgeColor}
+                isVerified={currentPlan.isVerified}
+              />
+            </div>
+            
+            {/* Context Pinning Button */}
+            <button
+              onClick={() => setShowContextPinning(true)}
+              className={`p-2 rounded-lg transition-colors ${
+                pinnedContexts.length > 0
+                  ? "bg-[var(--accent)]/20 text-[var(--accent)]"
+                  : "hover:bg-[var(--surface)] text-[var(--text-secondary)]"
+              }`}
+              title={`Context Pinning (${pinnedContexts.length} aktif)`}
+            >
+              <Pin className="w-4 h-4" />
+            </button>
+            
+            {/* Settings Button */}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="hidden sm:block p-2 rounded-lg hover:bg-[var(--surface)] text-[var(--text-secondary)] transition-colors"
+              title="Setelan & Akun"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+            
+            {/* User Avatar */}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-medium text-sm hover:opacity-90 transition-opacity"
+              title="Setelan & Akun"
+            >
+              {getUserInitial()}
+            </button>
+          </div>
+        </header>
+
+        {/* Mobile Persona Selector - shown only on small screens */}
+        <div className="sm:hidden px-3 py-2 border-b border-[var(--border)]">
+          <PersonaSelector
+            selectedPersona={selectedPersona}
+            onSelect={setSelectedPersona}
+            compact
+          />
+        </div>
+
+        {/* Chat Area */}
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          {!hasMessages ? (
+            // Welcome Screen - ChatGPT style layout
+            <div className="flex-1 flex flex-col">
+              {/* Centered Content */}
+              <div className="flex-1 flex flex-col items-center justify-center px-4 pb-4">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-medium mb-6 text-center text-[var(--foreground)]">
+                  Apa yang bisa saya bantu?
+                </h2>
+                
+                {/* Quick Action Buttons - ChatGPT style */}
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-md">
+                  <button
+                    onClick={() => handleSendMessage("Buatkan gambar untuk saya")}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm text-[var(--foreground)]">Buat gambar</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleSendMessage("Rangkum teks berikut untuk saya:")}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span className="text-sm text-[var(--foreground)]">Rangkum teks</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleSendMessage("Bantu saya menulis kode untuk:")}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    <span className="text-sm text-[var(--foreground)]">Kode</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleSendMessage("Kejutkan saya dengan fakta menarik!")}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                    <span className="text-sm text-[var(--foreground)]">Kejutkan saya</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowTemplates(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                  >
+                    <span className="text-sm text-[var(--foreground)]">Lainnya</span>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Input at Bottom */}
+              <div className="px-2 sm:px-4 pb-2 sm:pb-4">
+                <div className="max-w-3xl mx-auto">
+                  <ChatInput
+                    onSendMessage={handleSendMessage}
+                    isLoading={isLoading}
+                    onStop={stop}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Messages List
+            <div className="max-w-4xl mx-auto pb-4 px-2 sm:px-4">
+              {processedMessages.map((message, index) => (
+                <ChatMessage
+                  key={message.id}
+                  message={{
+                    id: message.id,
+                    role: message.role as "user" | "assistant",
+                    content: message.content,
+                  }}
+                  isStreaming={isLoading && index === messages.length - 1 && message.role === "assistant"}
+                  onEdit={message.role === "user" ? handleEditMessage : undefined}
+                  onRegenerate={message.role === "assistant" ? handleRegenerate : undefined}
+                />
+              ))}
+              
+              {/* Typing Indicator */}
+              {isLoading && messages[messages.length - 1]?.role === "user" && (
+                <TypingIndicator />
+              )}
+              
+              {/* Follow-up Suggestions */}
+              {!isLoading && suggestions.length > 0 && (
+                <div className="px-2 sm:px-4 max-w-4xl mx-auto">
+                  <FollowUpSuggestions
+                    suggestions={suggestions}
+                    onSelect={handleFollowUpSelect}
+                    isLoading={isLoading}
+                  />
+                </div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input Area - Fixed at bottom when there are messages */}
+        {hasMessages && (
+          <div className="border-t border-[var(--border)] bg-[var(--background)] py-2 sm:py-4 px-2 sm:px-0">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              onStop={stop}
+            />
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

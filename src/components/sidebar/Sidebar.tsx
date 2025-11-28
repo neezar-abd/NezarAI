@@ -348,17 +348,6 @@ export function Sidebar({
           </button>
         </div>
       </aside>
-
-      {/* Toggle button when collapsed (desktop) */}
-      {!isOpen && (
-        <button
-          onClick={onToggle}
-          className="hidden lg:flex fixed top-3 left-3 z-50 p-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
-          title="Open sidebar"
-        >
-          <Menu className="w-5 h-5 text-[var(--text-secondary)]" />
-        </button>
-      )}
     </>
   );
 }

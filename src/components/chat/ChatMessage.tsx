@@ -72,21 +72,21 @@ export function ChatMessage({
   return (
     <div
       className={cn(
-        "group flex gap-4 px-4 py-6",
+        "group flex gap-2 sm:gap-4 px-2 sm:px-4 py-3 sm:py-6",
         isUser ? "justify-end" : "justify-start"
       )}
     >
       {/* Avatar for Assistant */}
       {!isUser && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-white" />
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center">
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
         </div>
       )}
 
       {/* Message Content */}
       <div
         className={cn(
-          "max-w-[85%] lg:max-w-[75%]",
+          "max-w-[90%] sm:max-w-[85%] lg:max-w-[75%]",
           isUser ? "order-first" : ""
         )}
       >
@@ -109,7 +109,7 @@ export function ChatMessage({
                       handleCancelEdit();
                     }
                   }}
-                  className="w-full bg-transparent text-[var(--foreground)] resize-none focus:outline-none min-w-[300px]"
+                  className="w-full bg-transparent text-[var(--foreground)] resize-none focus:outline-none min-w-[200px] sm:min-w-[300px] text-sm sm:text-base"
                   rows={1}
                 />
                 <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-[var(--border)]">
@@ -160,36 +160,36 @@ export function ChatMessage({
 
             {/* Action Buttons - Only show when not streaming */}
             {!isStreaming && message.content && (
-              <div className="flex items-center gap-1 -ml-2">
+              <div className="flex items-center gap-0.5 sm:gap-1 -ml-2 flex-wrap">
                 <CopyButton text={message.content} />
                 <button
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 transition-colors"
                   title="Bagus"
                 >
-                  <ThumbsUp className="w-4 h-4 text-[var(--text-secondary)]" />
+                  <ThumbsUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
                 </button>
                 <button
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 transition-colors"
                   title="Kurang bagus"
                 >
-                  <ThumbsDown className="w-4 h-4 text-[var(--text-secondary)]" />
+                  <ThumbsDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
                 </button>
                 <button
                   onClick={handleRegenerate}
                   className={cn(
-                    "p-2 rounded-lg hover:bg-white/10 transition-colors",
+                    "p-1.5 sm:p-2 rounded-lg hover:bg-white/10 transition-colors",
                     onRegenerate ? "cursor-pointer" : "cursor-not-allowed opacity-50"
                   )}
                   title="Regenerate"
                   disabled={!onRegenerate}
                 >
-                  <RotateCcw className="w-4 h-4 text-[var(--text-secondary)]" />
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
                 </button>
                 <button
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 transition-colors"
                   title="Bagikan"
                 >
-                  <Share className="w-4 h-4 text-[var(--text-secondary)]" />
+                  <Share className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
                 </button>
               </div>
             )}
@@ -199,8 +199,8 @@ export function ChatMessage({
 
       {/* Avatar for User */}
       {isUser && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
-          <User className="w-4 h-4 text-white" />
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center">
+          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
         </div>
       )}
     </div>
