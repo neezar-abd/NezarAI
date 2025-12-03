@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useChat } from "@ai-sdk/react";
-import { Pin, Settings } from "lucide-react";
+import { Pin, Settings, Youtube, Github, Calendar } from "lucide-react";
 import { Sidebar, Conversation } from "@/components/sidebar/Sidebar";
-import { ChatInput, AttachedImage, AttachedFile } from "@/components/chat/ChatInput";
+import { ChatInput, AttachedImage, AttachedFile, ModelSpeed, MODEL_CONFIG } from "@/components/chat/ChatInput";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { PersonaSelector } from "@/components/chat/PersonaSelector";
@@ -14,6 +14,9 @@ import { PromptTemplates } from "@/components/chat/PromptTemplates";
 import { RateLimitWarning, RequestCounter } from "@/components/chat/RateLimitWarning";
 import { SettingsModal } from "@/components/settings/SettingsModal";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { YouTubeSummary } from "@/components/integrations/YouTubeSummary";
+import { GitHubAnalyzer } from "@/components/integrations/GitHubAnalyzer";
+import { GoogleCalendar } from "@/components/integrations/GoogleCalendar";
 import { generateId, parseFollowUpSuggestions, cn } from "@/lib/utils";
 import { Persona, defaultPersona } from "@/lib/personas";
 import { useUserPlan } from "@/hooks/useUserPlan";
@@ -36,12 +39,16 @@ export default function ChatPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showYouTube, setShowYouTube] = useState(false);
+  const [showGitHub, setShowGitHub] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [messageImages, setMessageImages] = useState<MessageImages>({});
   const [pendingImages, setPendingImages] = useState<AttachedImage[]>([]);
   const [rateLimitWarning, setRateLimitWarning] = useState<{ show: boolean; waitTime: number }>({
     show: false,
     waitTime: 0,
   });
+  const [selectedModel, setSelectedModel] = useState<ModelSpeed>("cepat");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auth - Local (fallback) and Firebase
@@ -103,6 +110,7 @@ export default function ChatPage() {
     body: {
       personaId: selectedPersona.id,
       pinnedContext: getContextString(),
+      modelId: MODEL_CONFIG[selectedModel].model,
     },
     onFinish: (message) => {
       // Save to storage when AI finishes responding
@@ -295,6 +303,24 @@ export default function ChatPage() {
     handleSendMessage(suggestion);
   };
 
+  // YouTube Summary handler
+  const handleYouTubeSummary = (summary: string, videoInfo: any) => {
+    const message = `📺 **Video YouTube: ${videoInfo.title}**\n\n${summary}`;
+    handleSendMessage(message);
+  };
+
+  // GitHub Analysis handler
+  const handleGitHubAnalysis = (analysis: string, repoInfo: any) => {
+    const message = `🐙 **Repository: ${repoInfo.fullName}**\n\n${analysis}`;
+    handleSendMessage(message);
+  };
+
+  // Calendar send to chat handler
+  const handleCalendarSendToChat = (content: string) => {
+    handleSendMessage(content);
+    setShowCalendar(false);
+  };
+
   // Unified login handler
   const handleLogin = async (email: string, password: string) => {
     if (isFirebaseConfigured) {
@@ -375,6 +401,27 @@ export default function ChatPage() {
         onClose={() => setShowContextPinning(false)}
         pinnedContexts={pinnedContexts}
         onUpdate={setPinnedContexts}
+      />
+
+      {/* YouTube Summary Modal */}
+      <YouTubeSummary
+        isOpen={showYouTube}
+        onClose={() => setShowYouTube(false)}
+        onSummaryGenerated={handleYouTubeSummary}
+      />
+
+      {/* GitHub Analyzer Modal */}
+      <GitHubAnalyzer
+        isOpen={showGitHub}
+        onClose={() => setShowGitHub(false)}
+        onAnalysisGenerated={handleGitHubAnalysis}
+      />
+
+      {/* Google Calendar Modal */}
+      <GoogleCalendar
+        isOpen={showCalendar}
+        onClose={() => setShowCalendar(false)}
+        onSendToChat={handleCalendarSendToChat}
       />
 
       {/* Sidebar */}
@@ -484,7 +531,34 @@ export default function ChatPage() {
                 </h2>
                 
                 {/* Quick Action Buttons - ChatGPT style */}
-                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-md">
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-xl">
+                  {/* YouTube Summary */}
+                  <button
+                    onClick={() => setShowYouTube(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-red-500/10 hover:border-red-500/50 transition-colors"
+                  >
+                    <Youtube className="w-5 h-5 text-red-500" />
+                    <span className="text-sm text-[var(--foreground)]">YouTube</span>
+                  </button>
+
+                  {/* GitHub Analyzer */}
+                  <button
+                    onClick={() => setShowGitHub(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-purple-500/10 hover:border-purple-500/50 transition-colors"
+                  >
+                    <Github className="w-5 h-5 text-purple-500" />
+                    <span className="text-sm text-[var(--foreground)]">GitHub</span>
+                  </button>
+
+                  {/* Google Calendar */}
+                  <button
+                    onClick={() => setShowCalendar(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-blue-500/10 hover:border-blue-500/50 transition-colors"
+                  >
+                    <Calendar className="w-5 h-5 text-blue-500" />
+                    <span className="text-sm text-[var(--foreground)]">Calendar</span>
+                  </button>
+
                   <button
                     onClick={() => handleSendMessage("Buatkan gambar untuk saya")}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
@@ -496,16 +570,6 @@ export default function ChatPage() {
                   </button>
                   
                   <button
-                    onClick={() => handleSendMessage("Rangkum teks berikut untuk saya:")}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
-                  >
-                    <svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span className="text-sm text-[var(--foreground)]">Rangkum teks</span>
-                  </button>
-                  
-                  <button
                     onClick={() => handleSendMessage("Bantu saya menulis kode untuk:")}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
                   >
@@ -513,16 +577,6 @@ export default function ChatPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
                     <span className="text-sm text-[var(--foreground)]">Kode</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => handleSendMessage("Kejutkan saya dengan fakta menarik!")}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
-                  >
-                    <svg className="w-5 h-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                    </svg>
-                    <span className="text-sm text-[var(--foreground)]">Kejutkan saya</span>
                   </button>
                   
                   <button
@@ -541,6 +595,11 @@ export default function ChatPage() {
                     onSendMessage={handleSendMessage}
                     isLoading={isLoading}
                     onStop={stop}
+                    onOpenYouTube={() => setShowYouTube(true)}
+                    onOpenGitHub={() => setShowGitHub(true)}
+                    onOpenCalendar={() => setShowCalendar(true)}
+                    selectedModel={selectedModel}
+                    onModelChange={setSelectedModel}
                   />
                 </div>
               </div>
@@ -590,6 +649,11 @@ export default function ChatPage() {
               onSendMessage={handleSendMessage}
               isLoading={isLoading}
               onStop={stop}
+              onOpenYouTube={() => setShowYouTube(true)}
+              onOpenGitHub={() => setShowGitHub(true)}
+              onOpenCalendar={() => setShowCalendar(true)}
+              selectedModel={selectedModel}
+              onModelChange={setSelectedModel}
             />
           </div>
         )}

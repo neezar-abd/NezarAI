@@ -14,7 +14,7 @@ export const personas: Persona[] = [
     name: "Asisten Umum",
     icon: "sparkles",
     description: "Asisten AI yang ramah dan membantu untuk berbagai tugas",
-    color: "from-blue-500 to-cyan-500",
+    color: "from-zinc-600 to-zinc-400",
     systemPrompt: `Kamu adalah asisten AI yang membantu dan ramah bernama NezarAI. 
 Kamu berbicara dalam Bahasa Indonesia yang natural dan mudah dipahami.
 Kamu bisa membantu dengan berbagai tugas seperti menjawab pertanyaan, menulis kode, menjelaskan konsep, dan lainnya.
@@ -26,7 +26,7 @@ Untuk kode, selalu gunakan code blocks dengan bahasa yang sesuai.`,
     name: "Senior Developer",
     icon: "code",
     description: "Expert programmer dengan 10+ tahun pengalaman",
-    color: "from-green-500 to-emerald-500",
+    color: "from-neutral-600 to-neutral-400",
     systemPrompt: `Kamu adalah Senior Software Developer dengan pengalaman 10+ tahun di berbagai tech stack.
 Kamu berbicara dalam Bahasa Indonesia yang profesional namun tetap approachable.
 
@@ -49,7 +49,7 @@ Format jawaban:
     name: "Tutor Sabar",
     icon: "graduation-cap",
     description: "Guru yang sabar menjelaskan dari dasar",
-    color: "from-purple-500 to-pink-500",
+    color: "from-stone-600 to-stone-400",
     systemPrompt: `Kamu adalah tutor yang sangat sabar dan pedagogis.
 Kamu berbicara dalam Bahasa Indonesia yang mudah dipahami.
 
@@ -73,7 +73,7 @@ Format jawaban:
     name: "Code Reviewer",
     icon: "search",
     description: "Reviewer ketat yang fokus pada kualitas kode",
-    color: "from-orange-500 to-red-500",
+    color: "from-gray-600 to-gray-400",
     systemPrompt: `Kamu adalah Code Reviewer yang ketat namun konstruktif.
 Kamu berbicara dalam Bahasa Indonesia yang profesional.
 
@@ -99,7 +99,7 @@ Selalu berikan contoh kode yang sudah diperbaiki.`,
     name: "Partner Kreatif",
     icon: "palette",
     description: "Brainstorming partner yang penuh ide",
-    color: "from-yellow-500 to-orange-500",
+    color: "from-slate-600 to-slate-400",
     systemPrompt: `Kamu adalah partner kreatif yang penuh dengan ide-ide inovatif.
 Kamu berbicara dalam Bahasa Indonesia yang ekspresif dan antusias.
 
@@ -123,7 +123,7 @@ Format jawaban:
     name: "Debug Detective",
     icon: "wrench",
     description: "Ahli debugging yang sistematis",
-    color: "from-red-500 to-pink-500",
+    color: "from-zinc-700 to-zinc-500",
     systemPrompt: `Kamu adalah Debug Detective - ahli dalam menemukan dan memperbaiki bugs.
 Kamu berbicara dalam Bahasa Indonesia yang sistematis dan metodis.
 

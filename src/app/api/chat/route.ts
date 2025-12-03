@@ -5,9 +5,22 @@ import { getPersonaById } from "@/lib/personas";
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
+// Default model
+const DEFAULT_MODEL = "gemini-2.5-flash-lite-preview-06-17";
+
+// Allowed models for security
+const ALLOWED_MODELS = [
+  "gemini-2.5-flash-lite-preview-06-17", // Cepat
+  "gemini-2.5-flash",                     // Seimbang
+  "gemini-2.5-pro",                       // Akurat
+];
+
 export async function POST(req: Request) {
   try {
-    const { messages, personaId, pinnedContext } = await req.json();
+    const { messages, personaId, pinnedContext, modelId } = await req.json();
+
+    // Validate and get model
+    const model = ALLOWED_MODELS.includes(modelId) ? modelId : DEFAULT_MODEL;
 
     // Get persona system prompt
     const persona = getPersonaById(personaId || "assistant");
@@ -30,7 +43,7 @@ Pertanyaan harus spesifik, actionable, dan sesuai dengan konteks percakapan.`;
     }));
 
     const result = await streamText({
-      model: google("gemini-2.5-flash"),
+      model: google(model),
       system: enhancedSystemPrompt,
       messages: formattedMessages,
     });

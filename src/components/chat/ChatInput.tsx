@@ -15,6 +15,9 @@ import {
   FileImage,
   FileText,
   File,
+  Youtube,
+  Github,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PromptTemplates } from "./PromptTemplates";
@@ -43,11 +46,37 @@ interface AttachedFile {
   isProcessing?: boolean;
 }
 
+// Model configurations
+export type ModelSpeed = "cepat" | "seimbang" | "akurat";
+
+export const MODEL_CONFIG: Record<ModelSpeed, { name: string; model: string; description: string }> = {
+  cepat: {
+    name: "Cepat",
+    model: "gemini-2.5-flash-lite-preview-06-17",
+    description: "Super cepat & hemat",
+  },
+  seimbang: {
+    name: "Seimbang",
+    model: "gemini-2.5-flash",
+    description: "Balance kualitas & kecepatan",
+  },
+  akurat: {
+    name: "Akurat",
+    model: "gemini-2.5-pro",
+    description: "Output berkualitas tinggi",
+  },
+};
+
 interface ChatInputProps {
   onSendMessage: (message: string, images?: AttachedImage[], files?: AttachedFile[]) => void;
   isLoading: boolean;
   onStop?: () => void;
   placeholder?: string;
+  onOpenYouTube?: () => void;
+  onOpenGitHub?: () => void;
+  onOpenCalendar?: () => void;
+  selectedModel?: ModelSpeed;
+  onModelChange?: (model: ModelSpeed) => void;
 }
 
 export function ChatInput({
@@ -55,9 +84,14 @@ export function ChatInput({
   isLoading,
   onStop,
   placeholder = "Minta NezarAI",
+  onOpenYouTube,
+  onOpenGitHub,
+  onOpenCalendar,
+  selectedModel = "cepat",
+  onModelChange,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
-  const [selectedModel, setSelectedModel] = useState("Penalaran");
+  const [localModel, setLocalModel] = useState<ModelSpeed>(selectedModel);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
@@ -229,7 +263,12 @@ export function ChatInput({
     }
   };
 
-  const modelOptions = ["Penalaran", "Kreatif", "Seimbang"];
+  const modelOptions: ModelSpeed[] = ["cepat", "seimbang", "akurat"];
+
+  const handleModelSelect = (model: ModelSpeed) => {
+    setLocalModel(model);
+    onModelChange?.(model);
+  };
 
   const handleTemplateSelect = (prompt: string) => {
     setMessage(prompt);
@@ -364,7 +403,7 @@ export function ChatInput({
                     className="fixed inset-0 z-10"
                     onClick={() => setShowAttachMenu(false)}
                   />
-                  <div className="absolute bottom-full left-0 mb-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg z-20 min-w-[200px] overflow-hidden">
+                  <div className="absolute bottom-full left-0 mb-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg z-20 min-w-[220px] overflow-hidden">
                     <button
                       onClick={() => imageInputRef.current?.click()}
                       className="flex items-center gap-3 w-full px-4 py-3 text-left text-sm text-[var(--foreground)] hover:bg-[var(--surface-hover)] transition-colors"
@@ -385,6 +424,60 @@ export function ChatInput({
                         <p className="text-xs text-[var(--text-muted)]">PDF, TXT, Code, dll</p>
                       </div>
                     </button>
+                    
+                    {/* Separator */}
+                    <div className="border-t border-[var(--border)] my-1" />
+                    
+                    {/* YouTube Summary */}
+                    {onOpenYouTube && (
+                      <button
+                        onClick={() => {
+                          setShowAttachMenu(false);
+                          onOpenYouTube();
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left text-sm text-[var(--foreground)] hover:bg-[var(--surface-hover)] transition-colors"
+                      >
+                        <Youtube className="w-4 h-4 text-red-500" />
+                        <div>
+                          <p>YouTube Summary</p>
+                          <p className="text-xs text-[var(--text-muted)]">Rangkum video YouTube</p>
+                        </div>
+                      </button>
+                    )}
+                    
+                    {/* GitHub Analyzer */}
+                    {onOpenGitHub && (
+                      <button
+                        onClick={() => {
+                          setShowAttachMenu(false);
+                          onOpenGitHub();
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left text-sm text-[var(--foreground)] hover:bg-[var(--surface-hover)] transition-colors border-t border-[var(--border)]"
+                      >
+                        <Github className="w-4 h-4 text-purple-500" />
+                        <div>
+                          <p>GitHub Analyzer</p>
+                          <p className="text-xs text-[var(--text-muted)]">Analisis repository</p>
+                        </div>
+                      </button>
+                    )}
+
+                    {/* Google Calendar */}
+                    {onOpenCalendar && (
+                      <button
+                        onClick={() => {
+                          setShowAttachMenu(false);
+                          onOpenCalendar();
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left text-sm text-[var(--foreground)] hover:bg-[var(--surface-hover)] transition-colors border-t border-[var(--border)]"
+                      >
+                        <Calendar className="w-4 h-4 text-blue-500" />
+                        <div>
+                          <p>Google Calendar</p>
+                          <p className="text-xs text-[var(--text-muted)]">Kelola jadwal</p>
+                        </div>
+                      </button>
+                    )}
                   </div>
                 </>
               )}
@@ -411,7 +504,7 @@ export function ChatInput({
                 className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
               >
                 <span className="text-xs sm:text-sm text-[var(--text-secondary)]">
-                  {selectedModel}
+                  {MODEL_CONFIG[localModel].name}
                 </span>
                 <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
               </button>
@@ -423,22 +516,23 @@ export function ChatInput({
                     className="fixed inset-0 z-10"
                     onClick={() => setShowModelDropdown(false)}
                   />
-                  <div className="absolute bottom-full right-0 mb-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg z-20 min-w-[150px] overflow-hidden">
+                  <div className="absolute bottom-full right-0 mb-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg z-20 min-w-[180px] overflow-hidden">
                     {modelOptions.map((option) => (
                       <button
                         key={option}
                         onClick={() => {
-                          setSelectedModel(option);
+                          handleModelSelect(option);
                           setShowModelDropdown(false);
                         }}
                         className={cn(
-                          "w-full px-4 py-3 text-left text-sm hover:bg-[var(--surface-hover)] transition-colors",
-                          option === selectedModel
+                          "w-full px-4 py-2.5 text-left hover:bg-[var(--surface-hover)] transition-colors",
+                          option === localModel
                             ? "text-[var(--accent)]"
                             : "text-[var(--foreground)]"
                         )}
                       >
-                        {option}
+                        <div className="text-sm font-medium">{MODEL_CONFIG[option].name}</div>
+                        <div className="text-xs text-[var(--text-muted)]">{MODEL_CONFIG[option].description}</div>
                       </button>
                     ))}
                   </div>
