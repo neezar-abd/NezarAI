@@ -18,6 +18,9 @@ import {
   Youtube,
   Github,
   Calendar,
+  Globe,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PromptTemplates } from "./PromptTemplates";
@@ -77,6 +80,8 @@ interface ChatInputProps {
   onOpenCalendar?: () => void;
   selectedModel?: ModelSpeed;
   onModelChange?: (model: ModelSpeed) => void;
+  useWebSearch?: boolean;
+  onWebSearchChange?: (enabled: boolean) => void;
 }
 
 export function ChatInput({
@@ -89,6 +94,8 @@ export function ChatInput({
   onOpenCalendar,
   selectedModel = "cepat",
   onModelChange,
+  useWebSearch = false,
+  onWebSearchChange,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [localModel, setLocalModel] = useState<ModelSpeed>(selectedModel);
@@ -98,6 +105,7 @@ export function ChatInput({
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -273,6 +281,32 @@ export function ChatInput({
   const handleTemplateSelect = (prompt: string) => {
     setMessage(prompt);
     textareaRef.current?.focus();
+  };
+
+  // Enhance prompt using AI
+  const handleEnhancePrompt = async () => {
+    if (!message.trim() || isEnhancing) return;
+
+    setIsEnhancing(true);
+    try {
+      const response = await fetch("/api/enhance-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: message }),
+      });
+
+      if (!response.ok) throw new Error("Failed to enhance prompt");
+
+      const data = await response.json();
+      if (data.enhanced) {
+        setMessage(data.enhanced);
+        textareaRef.current?.focus();
+      }
+    } catch (error) {
+      console.error("Error enhancing prompt:", error);
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   // Cleanup object URLs on unmount
@@ -492,10 +526,53 @@ export function ChatInput({
               <BookTemplate className="w-4 h-4 text-[var(--text-secondary)]" />
               <span className="text-sm text-[var(--text-secondary)] hidden sm:inline">Templates</span>
             </button>
+
+            {/* Enhance Prompt Button */}
+            {message.trim() && (
+              <button
+                type="button"
+                onClick={handleEnhancePrompt}
+                disabled={isEnhancing}
+                className={cn(
+                  "flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full transition-colors",
+                  isEnhancing
+                    ? "bg-purple-500/20 text-purple-400"
+                    : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-purple-400"
+                )}
+                title="Enhance prompt dengan AI"
+              >
+                {isEnhancing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                <span className="text-xs sm:text-sm hidden sm:inline">
+                  {isEnhancing ? "Enhancing..." : "Enhance"}
+                </span>
+              </button>
+            )}
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-0.5 sm:gap-1">
+            {/* Web Search Toggle */}
+            <button
+              type="button"
+              onClick={() => onWebSearchChange?.(!useWebSearch)}
+              className={cn(
+                "flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full transition-colors",
+                useWebSearch
+                  ? "bg-blue-500/20 text-blue-400"
+                  : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)]"
+              )}
+              title={useWebSearch ? "Web Search aktif" : "Aktifkan Web Search"}
+            >
+              <Globe className="w-4 h-4" />
+              <span className="text-xs sm:text-sm hidden sm:inline">
+                {useWebSearch ? "Search" : "Search"}
+              </span>
+            </button>
+
             {/* Model Selector */}
             <div className="relative">
               <button

@@ -1,26 +1,31 @@
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
 import { getPersonaById } from "@/lib/personas";
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+// Allow streaming responses up to 60 seconds for web search
+export const maxDuration = 60;
 
 // Default model
-const DEFAULT_MODEL = "gemini-2.5-flash-lite-preview-06-17";
+const DEFAULT_MODEL = "gemini-2.0-flash-lite";
 
 // Allowed models for security
 const ALLOWED_MODELS = [
-  "gemini-2.5-flash-lite-preview-06-17", // Cepat
-  "gemini-2.5-flash",                     // Seimbang
-  "gemini-2.5-pro",                       // Akurat
+  "gemini-2.0-flash-lite",  // Cepat
+  "gemini-2.5-flash",       // Seimbang
+  "gemini-2.5-pro",         // Akurat
 ];
 
 export async function POST(req: Request) {
   try {
-    const { messages, personaId, pinnedContext, modelId } = await req.json();
+    const { messages, personaId, pinnedContext, modelId, useWebSearch } = await req.json();
 
     // Validate and get model
-    const model = ALLOWED_MODELS.includes(modelId) ? modelId : DEFAULT_MODEL;
+    let model = ALLOWED_MODELS.includes(modelId) ? modelId : DEFAULT_MODEL;
+
+    // If web search is enabled, use gemini-2.0-flash (best support for grounding)
+    if (useWebSearch) {
+      model = "gemini-2.0-flash";
+    }
 
     // Get persona system prompt
     const persona = getPersonaById(personaId || "assistant");
@@ -42,8 +47,18 @@ Pertanyaan harus spesifik, actionable, dan sesuai dengan konteks percakapan.`;
       content: msg.content,
     }));
 
+    // Create Google AI provider with optional grounding
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    });
+
+    // Create model with Google Search grounding if enabled
+    const googleModel = google(model, {
+      useSearchGrounding: useWebSearch,
+    });
+
     const result = await streamText({
-      model: google(model),
+      model: googleModel,
       system: enhancedSystemPrompt,
       messages: formattedMessages,
     });

@@ -49,6 +49,7 @@ export default function ChatPage() {
     waitTime: 0,
   });
   const [selectedModel, setSelectedModel] = useState<ModelSpeed>("cepat");
+  const [useWebSearch, setUseWebSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auth - Local (fallback) and Firebase
@@ -111,6 +112,7 @@ export default function ChatPage() {
       personaId: selectedPersona.id,
       pinnedContext: getContextString(),
       modelId: MODEL_CONFIG[selectedModel].model,
+      useWebSearch,
     },
     onFinish: (message) => {
       // Save to storage when AI finishes responding
@@ -608,6 +610,8 @@ export default function ChatPage() {
                     onOpenCalendar={() => setShowCalendar(true)}
                     selectedModel={selectedModel}
                     onModelChange={setSelectedModel}
+                    useWebSearch={useWebSearch}
+                    onWebSearchChange={setUseWebSearch}
                   />
                 </div>
               </div>
@@ -664,6 +668,8 @@ export default function ChatPage() {
               onOpenCalendar={() => setShowCalendar(true)}
               selectedModel={selectedModel}
               onModelChange={setSelectedModel}
+              useWebSearch={useWebSearch}
+              onWebSearchChange={setUseWebSearch}
             />
           </div>
         )}

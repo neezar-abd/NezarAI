@@ -18,12 +18,13 @@ export function CodePlayground({ code, language, isOpen, onClose }: CodePlaygrou
   const [editableCode, setEditableCode] = useState(code);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeSrc, setIframeSrc] = useState<string>("");
 
   useEffect(() => {
     setEditableCode(code);
     setOutput("");
     setError("");
+    setIframeSrc("");
   }, [code]);
 
   if (!isOpen) return null;
@@ -36,21 +37,14 @@ export function CodePlayground({ code, language, isOpen, onClose }: CodePlaygrou
     setIsRunning(true);
     setOutput("");
     setError("");
+    setIframeSrc("");
 
     try {
       const lang = language.toLowerCase();
 
       if (lang === "html" || editableCode.includes("<html") || editableCode.includes("<!DOCTYPE")) {
-        // Run HTML in iframe
-        if (iframeRef.current) {
-          const iframe = iframeRef.current;
-          const doc = iframe.contentDocument || iframe.contentWindow?.document;
-          if (doc) {
-            doc.open();
-            doc.write(editableCode);
-            doc.close();
-          }
-        }
+        // Run HTML using srcdoc (safer, no cross-origin issues)
+        setIframeSrc(editableCode);
         setOutput("HTML rendered in preview below");
       } else if (lang === "javascript" || lang === "js" || lang === "typescript" || lang === "ts") {
         // Run JavaScript with console capture
@@ -98,31 +92,24 @@ export function CodePlayground({ code, language, isOpen, onClose }: CodePlaygrou
           setOutput("Code executed successfully (no output)");
         }
       } else if (lang === "css") {
-        // Preview CSS with sample HTML
-        if (iframeRef.current) {
-          const iframe = iframeRef.current;
-          const doc = iframe.contentDocument || iframe.contentWindow?.document;
-          if (doc) {
-            doc.open();
-            doc.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <style>${editableCode}</style>
-              </head>
-              <body>
-                <div class="container">
-                  <h1>Sample Heading</h1>
-                  <p>This is a sample paragraph to preview your CSS.</p>
-                  <button>Sample Button</button>
-                  <div class="box">Sample Box</div>
-                </div>
-              </body>
-              </html>
-            `);
-            doc.close();
-          }
-        }
+        // Preview CSS with sample HTML using srcdoc
+        const cssPreview = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>${editableCode}</style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Sample Heading</h1>
+              <p>This is a sample paragraph to preview your CSS.</p>
+              <button>Sample Button</button>
+              <div class="box">Sample Box</div>
+            </div>
+          </body>
+          </html>
+        `;
+        setIframeSrc(cssPreview);
         setOutput("CSS applied to preview below");
       }
     } catch (err) {
@@ -264,8 +251,13 @@ export function CodePlayground({ code, language, isOpen, onClose }: CodePlaygrou
             </div>
 
             <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Console Output */}
-              <div className="flex-1 p-4 bg-[#0d0d0d] overflow-auto">
+              {/* Console Output - smaller when preview is shown */}
+              <div className={cn(
+                "p-4 bg-[#0d0d0d] overflow-auto shrink-0",
+                (language.toLowerCase() === "html" || language.toLowerCase() === "css" || editableCode.includes("<html"))
+                  ? "h-20"
+                  : "flex-1"
+              )}>
                 {error ? (
                   <pre className="text-red-400 font-mono text-sm whitespace-pre-wrap">
                     Error: {error}
@@ -287,13 +279,13 @@ export function CodePlayground({ code, language, isOpen, onClose }: CodePlaygrou
               {(language.toLowerCase() === "html" ||
                 language.toLowerCase() === "css" ||
                 editableCode.includes("<html")) && (
-                <div className="h-48 border-t border-[var(--border)]">
-                  <div className="px-3 py-1 border-b border-[var(--border)] bg-[var(--surface)]/50">
+                <div className="flex-1 min-h-[200px] border-t border-[var(--border)] flex flex-col">
+                  <div className="px-3 py-1 border-b border-[var(--border)] bg-[var(--surface)]/50 shrink-0">
                     <span className="text-xs text-[var(--text-muted)]">Preview</span>
                   </div>
                   <iframe
-                    ref={iframeRef}
-                    className="w-full h-full bg-white"
+                    srcDoc={iframeSrc || "<!DOCTYPE html><html><body><p style='color:#888;padding:16px;'>Click Run to preview</p></body></html>"}
+                    className="w-full flex-1 bg-white"
                     sandbox="allow-scripts"
                     title="Code Preview"
                   />
