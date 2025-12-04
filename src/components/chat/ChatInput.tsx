@@ -52,7 +52,7 @@ export type ModelSpeed = "cepat" | "seimbang" | "akurat";
 export const MODEL_CONFIG: Record<ModelSpeed, { name: string; model: string; description: string }> = {
   cepat: {
     name: "Cepat",
-    model: "gemini-2.5-flash-lite-preview-06-17",
+    model: "gemini-2.0-flash-lite",
     description: "Super cepat & hemat",
   },
   seimbang: {
