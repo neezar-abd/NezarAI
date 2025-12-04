@@ -30,7 +30,9 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
-            <span className="text-lg sm:text-xl font-bold text-white">NezarAI</span>
+            <span className="text-lg sm:text-xl text-white">
+              <span className="font-normal">nezar</span><span className="font-bold">ai</span>
+            </span>
             
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors underline-animate">Features</a>
@@ -109,30 +111,21 @@ export default function LandingPage() {
 
       {/* Hero Section - Full Screen */}
       <section className="relative min-h-screen flex flex-col justify-center px-4">
-        {/* Background Effects - smaller on mobile */}
+        {/* Background Effects - monochrome */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-0 sm:left-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-violet-500/20 rounded-full blur-3xl animate-blobMorph" />
-          <div className="absolute top-1/3 right-0 sm:right-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-fuchsia-500/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 left-1/4 sm:left-1/3 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-violet-500/15 rounded-full blur-3xl animate-blobMorph delay-500" />
+          <div className="absolute top-1/4 left-0 sm:left-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-white/5 rounded-full blur-3xl animate-blobMorph" />
+          <div className="absolute top-1/3 right-0 sm:right-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-white/5 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-1/4 left-1/4 sm:left-1/3 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-white/3 rounded-full blur-3xl animate-blobMorph delay-500" />
         </div>
         
         <div className="relative max-w-7xl mx-auto text-center pt-16 sm:pt-20">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10 bg-white/5 mb-6 sm:mb-8 animate-fadeInDown">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="text-xs sm:text-sm text-gray-300">Powered by Gemini 2.5 Flash</span>
-          </div>
-          
           {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-4 sm:mb-6 animate-fadeInUp delay-100">
-            <span className="bg-gradient-to-r from-white via-white to-gray-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-4 sm:mb-6 animate-fadeInUp">
+            <span className="text-white">
               AI Chatbot untuk
             </span>
             <br />
-            <span className="gradient-text-animated">
+            <span className="text-gray-400">
               Produktivitas Maksimal
             </span>
           </h1>
@@ -207,13 +200,13 @@ export default function LandingPage() {
       <section id="features" className="py-16 sm:py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs sm:text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 text-gray-400 text-xs sm:text-sm mb-4">
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
               FEATURES
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-2">
               Fitur yang Membuat <br className="hidden sm:block" />
-              <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              <span className="text-gray-400">
                 Kamu Lebih Produktif
               </span>
             </h2>
@@ -224,9 +217,9 @@ export default function LandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 stagger-children">
             {/* Feature 1 */}
-            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/30 transition-all hover-lift">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#1a1a2e] border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-violet-500/50 transition-colors">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-violet-400 transition-colors" />
+            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all hover-lift">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white/30 transition-colors">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">6 AI Personas</h3>
               <p className="text-gray-400 text-xs sm:text-sm">
@@ -235,9 +228,9 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/30 transition-all hover-lift">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#1a1a2e] border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-violet-500/50 transition-colors">
-                <Code className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-violet-400 transition-colors" />
+            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all hover-lift">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white/30 transition-colors">
+                <Code className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">Code Playground</h3>
               <p className="text-gray-400 text-xs sm:text-sm">
@@ -246,9 +239,9 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/30 transition-all hover-lift">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#1a1a2e] border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-violet-500/50 transition-colors">
-                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-violet-400 transition-colors" />
+            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all hover-lift">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white/30 transition-colors">
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">16+ Prompt Templates</h3>
               <p className="text-gray-400 text-xs sm:text-sm">
@@ -257,9 +250,9 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 4 */}
-            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/30 transition-all hover-lift">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#1a1a2e] border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-violet-500/50 transition-colors">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-violet-400 transition-colors" />
+            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all hover-lift">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white/30 transition-colors">
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">Streaming Response</h3>
               <p className="text-gray-400 text-xs sm:text-sm">
@@ -268,9 +261,9 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 5 */}
-            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/30 transition-all hover-lift">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#1a1a2e] border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-violet-500/50 transition-colors">
-                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-violet-400 transition-colors" />
+            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all hover-lift">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white/30 transition-colors">
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">Context Pinning</h3>
               <p className="text-gray-400 text-xs sm:text-sm">
@@ -279,9 +272,9 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 6 */}
-            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/30 transition-all hover-lift">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#1a1a2e] border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-violet-500/50 transition-colors">
-                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-violet-400 transition-colors" />
+            <div className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all hover-lift">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white/30 transition-colors">
+                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">Follow-up Suggestions</h3>
               <p className="text-gray-400 text-xs sm:text-sm">
@@ -293,39 +286,39 @@ export default function LandingPage() {
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="py-16 sm:py-24 px-4 bg-gradient-to-b from-transparent via-violet-950/10 to-transparent">
+      <section id="how-it-works" className="py-16 sm:py-24 px-4 bg-white/[0.02]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs sm:text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 text-gray-400 text-xs sm:text-sm mb-4">
               <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
               HOW IT WORKS
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
-              Mulai dalam <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">3 Langkah</span>
+              Mulai dalam <span className="text-gray-400">3 Langkah</span>
             </h2>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-6 sm:gap-8 stagger-children">
             <div className="relative text-center group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-xl sm:text-2xl font-bold group-hover:scale-110 transition-transform animate-pulseGlow">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-xl sm:text-2xl font-bold group-hover:scale-110 transition-transform text-white">
                 1
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-2">Pilih Persona</h3>
               <p className="text-gray-400 text-sm">Pilih AI persona yang sesuai dengan kebutuhan kamu.</p>
-              <div className="hidden sm:block absolute top-6 sm:top-8 left-[60%] w-[80%] h-[2px] bg-gradient-to-r from-violet-500 to-transparent" />
+              <div className="hidden sm:block absolute top-6 sm:top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-white/20 to-transparent" />
             </div>
 
             <div className="relative text-center group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-xl sm:text-2xl font-bold group-hover:scale-110 transition-transform animate-pulseGlow">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-xl sm:text-2xl font-bold group-hover:scale-110 transition-transform text-white">
                 2
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-2">Tanyakan atau Gunakan Template</h3>
               <p className="text-gray-400 text-sm">Ketik pertanyaan atau pilih dari 16+ template yang tersedia.</p>
-              <div className="hidden sm:block absolute top-6 sm:top-8 left-[60%] w-[80%] h-[2px] bg-gradient-to-r from-violet-500 to-transparent" />
+              <div className="hidden sm:block absolute top-6 sm:top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-white/20 to-transparent" />
             </div>
 
             <div className="text-center group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-xl sm:text-2xl font-bold group-hover:scale-110 transition-transform animate-pulseGlow">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 text-xl sm:text-2xl font-bold group-hover:scale-110 transition-transform text-white">
                 3
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-2">Dapatkan Jawaban</h3>
@@ -339,12 +332,12 @@ export default function LandingPage() {
       <section id="pricing" className="py-16 sm:py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs sm:text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 text-gray-400 text-xs sm:text-sm mb-4">
               <Star className="w-3 h-3 sm:w-4 sm:h-4" />
               PRICING
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
-              Pilih Plan yang <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Cocok</span>
+              Pilih Plan yang <span className="text-gray-400">Cocok</span>
             </h2>
             <p className="text-gray-400 text-sm sm:text-base">Mulai gratis, upgrade kapan saja.</p>
           </div>
@@ -382,38 +375,38 @@ export default function LandingPage() {
             </div>
 
             {/* Pro Plan */}
-            <div className="p-5 sm:p-8 rounded-xl sm:rounded-2xl border-2 border-violet-500 bg-gradient-to-b from-violet-500/10 to-transparent relative hover-lift hover-glow sm:col-span-2 lg:col-span-1">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-violet-500 rounded-full text-[10px] sm:text-xs font-medium animate-bounce-slow">
+            <div className="p-5 sm:p-8 rounded-xl sm:rounded-2xl border-2 border-white/30 bg-white/5 relative hover-lift sm:col-span-2 lg:col-span-1">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-white text-black rounded-full text-[10px] sm:text-xs font-medium">
                 POPULAR
               </div>
-              <div className="text-xs sm:text-sm text-violet-400 mb-2">PRO</div>
+              <div className="text-xs sm:text-sm text-gray-400 mb-2">PRO</div>
               <div className="text-xl sm:text-2xl font-bold mb-1">Hubungi Admin</div>
               <div className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Untuk produktivitas maksimal</div>
               <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
                 <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-violet-500 shrink-0" />
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white shrink-0" />
                   30 request / menit
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-violet-500 shrink-0" />
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white shrink-0" />
                   Semua fitur Noob
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-violet-500 shrink-0" />
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white shrink-0" />
                   Priority response
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-violet-500 shrink-0" />
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white shrink-0" />
                   Chat history sync
                 </li>
                 <li className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-violet-500 shrink-0" />
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white shrink-0" />
                   Image analysis
                 </li>
               </ul>
               <TransitionLink
                 href="/chat"
-                className="block w-full py-2.5 sm:py-3 text-center rounded-full bg-violet-500 hover:bg-violet-600 transition-colors font-medium text-sm"
+                className="block w-full py-2.5 sm:py-3 text-center rounded-full bg-white text-black hover:bg-gray-200 transition-colors font-medium text-sm"
               >
                 Upgrade ke Pro
               </TransitionLink>
@@ -458,15 +451,15 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-16 sm:py-24 px-4 bg-gradient-to-b from-transparent via-violet-950/10 to-transparent">
+      <section id="faq" className="py-16 sm:py-24 px-4 bg-white/[0.02]">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs sm:text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 text-gray-400 text-xs sm:text-sm mb-4">
               <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
               FAQ
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">
-              Pertanyaan <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Umum</span>
+              Pertanyaan <span className="text-gray-400">Umum</span>
             </h2>
           </div>
 
@@ -493,10 +486,10 @@ export default function LandingPage() {
                 a: "Klik tombol Settings di aplikasi, lalu pilih plan Pro. Pembayaran bisa via transfer atau e-wallet."
               },
             ].map((faq, i) => (
-              <details key={i} className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-violet-500/30 transition-all">
+              <details key={i} className="group p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-all">
                 <summary className="flex items-center justify-between cursor-pointer list-none gap-2">
                   <span className="font-medium text-sm sm:text-base">{faq.q}</span>
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 group-open:rotate-90 group-hover:text-violet-400 transition-all shrink-0" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 group-open:rotate-90 group-hover:text-white transition-all shrink-0" />
                 </summary>
                 <p className="mt-3 sm:mt-4 text-gray-400 text-xs sm:text-sm">{faq.a}</p>
               </details>
@@ -506,11 +499,11 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 px-4 particles-bg">
+      <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
             Siap Meningkatkan <br />
-            <span className="gradient-text-animated">
+            <span className="text-gray-400">
               Produktivitas Kamu?
             </span>
           </h2>
@@ -531,7 +524,9 @@ export default function LandingPage() {
       <footer className="py-8 sm:py-12 px-4 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            <span className="text-lg sm:text-xl font-bold text-white">NezarAI</span>
+            <span className="text-lg sm:text-xl text-white">
+              <span className="font-normal">nezar</span><span className="font-bold">ai</span>
+            </span>
             
             <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
               <a href="#" className="hover:text-white transition-colors underline-animate">Privacy</a>
@@ -540,7 +535,7 @@ export default function LandingPage() {
             </div>
             
             <div className="text-xs sm:text-sm text-gray-500">
-              2025 NezarAI. Made with passion.
+              2025 nezarai. Made with passion.
             </div>
           </div>
         </div>

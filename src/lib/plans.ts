@@ -67,7 +67,7 @@ export const plans: Record<PlanType, Plan> = {
     description: "Unlimited everything untuk developer sejati",
     requestsPerMinute: -1, // Unlimited
     badge: "HACKER",
-    badgeColor: "bg-gradient-to-r from-emerald-500 to-green-400",
+    badgeColor: "bg-zinc-800 border border-zinc-500",
     features: [
       "Unlimited request 🔥",
       "Semua model termasuk Akurat (Pro)",

@@ -809,3 +809,196 @@ body.page-transitioning > div {
   }
 }
 
+/* ==================== */
+/* PWA & Mobile Styles  */
+/* ==================== */
+
+/* Safe area for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Prevent text selection on touch */
+.touch-none {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Smooth scrolling for iOS */
+.scroll-smooth-ios {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar on mobile but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile tap highlight removal */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch-friendly button sizing */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Larger touch targets for mobile */
+  button, 
+  [role="button"],
+  a {
+    min-height: 36px;
+  }
+  
+  /* Better font sizes for mobile */
+  html {
+    font-size: 16px; /* Prevents zoom on input focus */
+  }
+  
+  /* Fix input zoom on iOS */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+  
+  /* Mobile chat input adjustments */
+  .chat-input-mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--background);
+    padding: 8px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border);
+    z-index: 50;
+  }
+}
+
+/* Standalone PWA mode */
+@media (display-mode: standalone) {
+  /* Extra padding for status bar on iOS */
+  .pwa-header {
+    padding-top: env(safe-area-inset-top, 20px);
+  }
+  
+  /* Bottom padding for home indicator */
+  .pwa-footer {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+}
+
+/* Pull to refresh indicator */
+.ptr-indicator {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  transition: transform 0.2s ease;
+  z-index: 100;
+}
+
+.ptr-indicator.active {
+  transform: translateX(-50%) translateY(20px);
+}
+
+/* Mobile menu animation */
+@media (max-width: 1024px) {
+  .mobile-menu-enter {
+    animation: slideInLeft 0.3s ease-out;
+  }
+  
+  .mobile-menu-exit {
+    animation: slideOutLeft 0.3s ease-in;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Haptic feedback simulation */
+.haptic-light:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+.haptic-medium:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* PWA install prompt banner */
+.install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 9999;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Loading skeleton for mobile */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-hover) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+

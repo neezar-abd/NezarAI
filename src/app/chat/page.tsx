@@ -32,7 +32,9 @@ interface MessageImages {
 }
 
 export default function ChatPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Default open
+  // Start with sidebar closed - will update on mount based on screen size
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<string>();
   const [selectedPersona, setSelectedPersona] = useState<Persona>(defaultPersona);
   const [showContextPinning, setShowContextPinning] = useState(false);
@@ -51,6 +53,12 @@ export default function ChatPage() {
   const [selectedModel, setSelectedModel] = useState<ModelSpeed>("cepat");
   const [useWebSearch, setUseWebSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Set sidebar state based on screen size after mount
+  useEffect(() => {
+    setHasMounted(true);
+    setSidebarOpen(window.innerWidth >= 1024);
+  }, []);
 
   // Auth - Local (fallback) and Firebase
   const localAuth = useAuth();
@@ -157,6 +165,10 @@ export default function ChatPage() {
   const handleNewChat = useCallback(() => {
     setMessages([]);
     setActiveConversationId(undefined);
+    // Close sidebar on mobile after creating new chat
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
   }, [setMessages]);
 
   const handleSelectConversation = useCallback((id: string) => {
@@ -164,6 +176,10 @@ export default function ChatPage() {
     if (conv) {
       setMessages(conv.messages);
       setActiveConversationId(id);
+      // Close sidebar on mobile after selecting
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
     }
   }, [getConversation, setMessages]);
 
@@ -458,8 +474,8 @@ export default function ChatPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg sm:text-xl font-light tracking-tight text-[var(--foreground)] truncate">
-              Nezar<span className="font-medium">AI</span>
+            <h1 className="text-lg sm:text-xl tracking-tight text-[var(--foreground)] truncate">
+              <span className="font-normal">nezar</span><span className="font-bold">ai</span>
             </h1>
             {/* Desktop Persona Selector - Hidden on mobile */}
             <div className="hidden sm:block">
@@ -506,7 +522,7 @@ export default function ChatPage() {
             {/* User Avatar */}
             <button
               onClick={() => setShowSettings(true)}
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-medium text-sm hover:opacity-90 transition-opacity"
+              className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 font-medium text-sm hover:bg-white/20 transition-colors"
               title="Setelan & Akun"
             >
               {getUserInitial()}
@@ -642,7 +658,7 @@ export default function ChatPage() {
               
               {/* Follow-up Suggestions */}
               {!isLoading && suggestions.length > 0 && (
-                <div className="px-2 sm:px-4">
+                <div className="px-4 sm:px-6">
                   <FollowUpSuggestions
                     suggestions={suggestions}
                     onSelect={handleFollowUpSelect}

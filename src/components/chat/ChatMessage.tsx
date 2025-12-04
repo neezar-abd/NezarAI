@@ -73,13 +73,13 @@ export function ChatMessage({
   return (
     <div
       className={cn(
-        "group flex gap-2 sm:gap-4 px-2 sm:px-4 py-3 sm:py-6",
+        "group flex gap-3 sm:gap-4 px-4 sm:px-6 py-4 sm:py-6",
         isUser ? "justify-end" : "justify-start"
       )}
     >
       {/* Avatar for Assistant */}
       {!isUser && (
-        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden">
+        <div className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden">
           <Image
             src="/avatar-ai.png"
             alt="NezarAI"
@@ -93,7 +93,7 @@ export function ChatMessage({
       {/* Message Content */}
       <div
         className={cn(
-          "max-w-[90%] sm:max-w-[85%] lg:max-w-[75%]",
+          "max-w-[85%] sm:max-w-[80%] lg:max-w-[70%]",
           isUser ? "order-first" : ""
         )}
       >
@@ -136,8 +136,8 @@ export function ChatMessage({
               </div>
             ) : (
               // Normal display
-              <div className="bg-[var(--surface)] rounded-2xl px-4 py-3">
-                <p className="text-[var(--foreground)] whitespace-pre-wrap">
+              <div className="bg-[var(--surface)] rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5">
+                <p className="text-[var(--foreground)] whitespace-pre-wrap text-[15px] sm:text-base leading-relaxed">
                   {message.content}
                 </p>
               </div>
@@ -206,8 +206,8 @@ export function ChatMessage({
 
       {/* Avatar for User */}
       {isUser && (
-        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center">
-          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+        <div className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+          <User className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white/80" />
         </div>
       )}
     </div>

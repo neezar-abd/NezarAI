@@ -182,7 +182,7 @@ export function SettingsModal({
 
               {/* User Profile */}
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 via-yellow-500 to-green-500 flex items-center justify-center text-white font-bold text-2xl">
+                <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/90 font-bold text-2xl">
                   {displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
@@ -407,6 +407,17 @@ export function SettingsModal({
                 </p>
                 <p className="text-sm text-[var(--accent)] mt-1">
                   📧 admin@nezarai.com | 💬 @admin_nezarai
+                </p>
+              </div>
+
+              {/* Attribution */}
+              <div className="mt-4 pt-4 border-t border-[var(--border)]">
+                <p className="text-xs text-[var(--text-muted)] text-center">
+                  <span className="font-normal">nezar</span><span className="font-bold">ai</span>
+                  <span className="ml-1">v1.0 • Dibuat oleh Neezar</span>
+                </p>
+                <p className="text-xs text-[var(--text-muted)] text-center mt-1">
+                  Didukung oleh Google Generative AI
                 </p>
               </div>
             </div>
