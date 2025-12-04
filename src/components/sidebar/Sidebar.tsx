@@ -165,14 +165,20 @@ export function Sidebar({
                 <button
                   onClick={() => onSelect(conv.id)}
                   className={cn(
-                    "flex items-center gap-3 w-full p-3 rounded-xl transition-colors text-left pr-10",
+                    "flex items-center gap-3 w-full p-3 rounded-xl transition-all text-left pr-10 relative",
                     conv.id === activeId
-                      ? "bg-[var(--surface)]"
-                      : "hover:bg-[var(--surface-hover)]"
+                      ? "bg-[var(--surface)] border-l-2 border-l-[var(--accent)] shadow-sm"
+                      : "hover:bg-[var(--surface-hover)] border-l-2 border-l-transparent"
                   )}
                 >
-                  <MessageSquare className="w-4 h-4 text-[var(--text-secondary)] shrink-0" />
-                  <span className="text-sm text-[var(--foreground)] truncate">
+                  <MessageSquare className={cn(
+                    "w-4 h-4 shrink-0 transition-colors",
+                    conv.id === activeId ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"
+                  )} />
+                  <span className={cn(
+                    "text-sm truncate transition-colors",
+                    conv.id === activeId ? "text-[var(--foreground)] font-medium" : "text-[var(--foreground)]"
+                  )}>
                     {truncate(conv.title, 24)}
                   </span>
                 </button>

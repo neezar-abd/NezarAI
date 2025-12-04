@@ -32,7 +32,7 @@ interface MessageImages {
 }
 
 export default function ChatPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed on mobile
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Default open
   const [activeConversationId, setActiveConversationId] = useState<string>();
   const [selectedPersona, setSelectedPersona] = useState<Persona>(defaultPersona);
   const [showContextPinning, setShowContextPinning] = useState(false);
@@ -456,7 +456,9 @@ export default function ChatPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-base sm:text-lg font-medium text-[var(--foreground)] truncate">NezarAI</h1>
+            <h1 className="text-lg sm:text-xl font-light tracking-tight text-[var(--foreground)] truncate">
+              Nezar<span className="font-medium">AI</span>
+            </h1>
             {/* Desktop Persona Selector - Hidden on mobile */}
             <div className="hidden sm:block">
               <PersonaSelector
@@ -522,68 +524,74 @@ export default function ChatPage() {
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto flex flex-col">
           {!hasMessages ? (
-            // Welcome Screen - ChatGPT style layout
+            // Welcome Screen - Minimalist elegant design
             <div className="flex-1 flex flex-col">
               {/* Centered Content */}
               <div className="flex-1 flex flex-col items-center justify-center px-4 pb-4">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-medium mb-6 text-center text-[var(--foreground)]">
-                  Apa yang bisa saya bantu?
-                </h2>
+                {/* Minimal greeting */}
+                <div className="mb-12 text-center">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-[var(--foreground)]">
+                    Halo, ada yang bisa dibantu?
+                  </h2>
+                  <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                    Ketik pesan atau pilih opsi di bawah
+                  </p>
+                </div>
                 
-                {/* Quick Action Buttons - ChatGPT style */}
-                <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-xl">
-                  {/* YouTube Summary */}
+                {/* Minimal action grid - monochrome */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-md w-full">
                   <button
                     onClick={() => setShowYouTube(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-red-500/10 hover:border-red-500/50 transition-colors"
+                    className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface)]/50 transition-all duration-200"
                   >
-                    <Youtube className="w-5 h-5 text-red-500" />
-                    <span className="text-sm text-[var(--foreground)]">YouTube</span>
+                    <Youtube className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" />
+                    <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors">YouTube</span>
                   </button>
 
-                  {/* GitHub Analyzer */}
                   <button
                     onClick={() => setShowGitHub(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-purple-500/10 hover:border-purple-500/50 transition-colors"
+                    className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface)]/50 transition-all duration-200"
                   >
-                    <Github className="w-5 h-5 text-purple-500" />
-                    <span className="text-sm text-[var(--foreground)]">GitHub</span>
+                    <Github className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" />
+                    <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors">GitHub</span>
                   </button>
 
-                  {/* Google Calendar */}
                   <button
                     onClick={() => setShowCalendar(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-blue-500/10 hover:border-blue-500/50 transition-colors"
+                    className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface)]/50 transition-all duration-200"
                   >
-                    <Calendar className="w-5 h-5 text-blue-500" />
-                    <span className="text-sm text-[var(--foreground)]">Calendar</span>
+                    <Calendar className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" />
+                    <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors">Calendar</span>
                   </button>
 
                   <button
                     onClick={() => handleSendMessage("Buatkan gambar untuk saya")}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                    className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface)]/50 transition-all duration-200"
                   >
-                    <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-sm text-[var(--foreground)]">Buat gambar</span>
+                    <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors">Gambar</span>
                   </button>
                   
                   <button
-                    onClick={() => handleSendMessage("Bantu saya menulis kode untuk:")}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                    onClick={() => handleSendMessage("Bantu saya menulis kode")}
+                    className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface)]/50 transition-all duration-200"
                   >
-                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    <svg className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
-                    <span className="text-sm text-[var(--foreground)]">Kode</span>
+                    <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors">Kode</span>
                   </button>
                   
                   <button
                     onClick={() => setShowTemplates(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+                    className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--border)] hover:border-[var(--text-secondary)] hover:bg-[var(--surface)]/50 transition-all duration-200"
                   >
-                    <span className="text-sm text-[var(--foreground)]">Lainnya</span>
+                    <svg className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                    </svg>
+                    <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors">Lainnya</span>
                   </button>
                 </div>
               </div>

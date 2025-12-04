@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Sparkles, User, ThumbsUp, ThumbsDown, RotateCcw, Share, Pencil, Check, X } from "lucide-react";
+import { User, ThumbsUp, ThumbsDown, RotateCcw, Share, Pencil, Check, X } from "lucide-react";
+import Image from "next/image";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { CopyButton } from "./CopyButton";
 import { cn } from "@/lib/utils";
@@ -78,8 +79,14 @@ export function ChatMessage({
     >
       {/* Avatar for Assistant */}
       {!isUser && (
-        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center">
-          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+        <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden">
+          <Image
+            src="/avatar-ai.png"
+            alt="NezarAI"
+            width={32}
+            height={32}
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
 

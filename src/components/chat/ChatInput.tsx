@@ -312,7 +312,7 @@ export function ChatInput({
         onSelect={handleTemplateSelect}
       />
 
-      <div className="relative bg-[var(--surface)] rounded-3xl border border-[var(--border)] focus-within:border-[var(--accent)]/50 transition-colors">
+      <div className="relative bg-[var(--surface)] rounded-3xl border border-[var(--border)] focus-within:border-[var(--accent)] focus-within:shadow-[0_0_0_3px_rgba(138,180,248,0.15)] transition-all duration-200">
         {/* Attachments Preview */}
         {hasAttachments && (
           <div className="px-4 pt-4 flex flex-wrap gap-2">
