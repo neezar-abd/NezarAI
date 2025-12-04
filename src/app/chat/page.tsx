@@ -606,29 +606,31 @@ export default function ChatPage() {
             </div>
           ) : (
             // Messages List
-            <div className="max-w-4xl mx-auto pb-4 px-2 sm:px-4">
-              {processedMessages.map((message, index) => (
-                <ChatMessage
-                  key={message.id}
-                  message={{
-                    id: message.id,
-                    role: message.role as "user" | "assistant",
-                    content: message.content,
-                  }}
-                  isStreaming={isLoading && index === messages.length - 1 && message.role === "assistant"}
-                  onEdit={message.role === "user" ? handleEditMessage : undefined}
-                  onRegenerate={message.role === "assistant" ? handleRegenerate : undefined}
-                />
-              ))}
-              
-              {/* Typing Indicator */}
-              {isLoading && messages[messages.length - 1]?.role === "user" && (
-                <TypingIndicator />
-              )}
+            <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto pb-4">
+              <div className="flex flex-col">
+                {processedMessages.map((message, index) => (
+                  <ChatMessage
+                    key={message.id}
+                    message={{
+                      id: message.id,
+                      role: message.role as "user" | "assistant",
+                      content: message.content,
+                    }}
+                    isStreaming={isLoading && index === messages.length - 1 && message.role === "assistant"}
+                    onEdit={message.role === "user" ? handleEditMessage : undefined}
+                    onRegenerate={message.role === "assistant" ? handleRegenerate : undefined}
+                  />
+                ))}
+                
+                {/* Typing Indicator */}
+                {isLoading && messages[messages.length - 1]?.role === "user" && (
+                  <TypingIndicator />
+                )}
+              </div>
               
               {/* Follow-up Suggestions */}
               {!isLoading && suggestions.length > 0 && (
-                <div className="px-2 sm:px-4 max-w-4xl mx-auto">
+                <div className="px-2 sm:px-4">
                   <FollowUpSuggestions
                     suggestions={suggestions}
                     onSelect={handleFollowUpSelect}
