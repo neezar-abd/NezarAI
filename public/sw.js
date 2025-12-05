@@ -4,7 +4,7 @@ const OFFLINE_URL = '/offline.html';
 // Assets to cache on install
 const PRECACHE_ASSETS = [
   '/',
-  '/chat',
+  '/',
   '/offline.html',
   '/manifest.json',
   '/icons/icon-192x192.png',
@@ -95,7 +95,7 @@ self.addEventListener('push', (event) => {
       badge: '/icons/icon-72x72.png',
       vibrate: [100, 50, 100],
       data: {
-        url: data.url || '/chat',
+        url: data.url || '/',
       },
     };
     

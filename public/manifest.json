@@ -81,7 +81,7 @@
       "name": "Chat Baru",
       "short_name": "Chat",
       "description": "Mulai percakapan baru",
-      "url": "/chat",
+      "url": "/",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ]
