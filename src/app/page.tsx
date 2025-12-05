@@ -142,7 +142,7 @@ export default function ChatPage() {
   }, [storedConversations]);
 
   // Auto-scroll to bottom when new messages arrive (debounced for performance)
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
