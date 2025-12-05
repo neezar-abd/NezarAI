@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, lazy, Suspense } from "react";
 import { useChat } from "@ai-sdk/react";
 import { Pin, Settings, Youtube, Github, Calendar } from "lucide-react";
 import { Sidebar, Conversation } from "@/components/sidebar/Sidebar";
 import { ChatInput, AttachedImage, AttachedFile, ModelSpeed, MODEL_CONFIG } from "@/components/chat/ChatInput";
-import { ChatMessage } from "@/components/chat/ChatMessage";
+import { ChatMessage, MemoizedChatMessage } from "@/components/chat/ChatMessage";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { PersonaSelector } from "@/components/chat/PersonaSelector";
 import { FollowUpSuggestions } from "@/components/chat/FollowUpSuggestions";
@@ -14,9 +14,6 @@ import { PromptTemplates } from "@/components/chat/PromptTemplates";
 import { RateLimitWarning, RequestCounter } from "@/components/chat/RateLimitWarning";
 import { SettingsModal } from "@/components/settings/SettingsModal";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { YouTubeSummary } from "@/components/integrations/YouTubeSummary";
-import { GitHubAnalyzer } from "@/components/integrations/GitHubAnalyzer";
-import { GoogleCalendar } from "@/components/integrations/GoogleCalendar";
 import { generateId, parseFollowUpSuggestions, cn } from "@/lib/utils";
 import { Persona, defaultPersona } from "@/lib/personas";
 import { useUserPlan } from "@/hooks/useUserPlan";
@@ -25,6 +22,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { useFirestoreStorage } from "@/hooks/useFirestoreStorage";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+
+// Lazy load heavy integration components
+const YouTubeSummary = lazy(() => import("@/components/integrations/YouTubeSummary").then(m => ({ default: m.YouTubeSummary })));
+const GitHubAnalyzer = lazy(() => import("@/components/integrations/GitHubAnalyzer").then(m => ({ default: m.GitHubAnalyzer })));
+const GoogleCalendar = lazy(() => import("@/components/integrations/GoogleCalendar").then(m => ({ default: m.GoogleCalendar })));
 
 // Store images separately (not in useChat messages)
 interface MessageImages {
@@ -54,10 +56,9 @@ export default function ChatPage() {
   const [useWebSearch, setUseWebSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Set sidebar state based on screen size after mount
+  // Set mounted state (sidebar always starts closed)
   useEffect(() => {
     setHasMounted(true);
-    setSidebarOpen(window.innerWidth >= 1024);
   }, []);
 
   // Auth - Local (fallback) and Firebase
@@ -140,9 +141,20 @@ export default function ChatPage() {
     }));
   }, [storedConversations]);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (debounced for performance)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    scrollTimeoutRef.current = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, [messages]);
 
   // Create new conversation when first message is sent
@@ -421,26 +433,38 @@ export default function ChatPage() {
         onUpdate={setPinnedContexts}
       />
 
-      {/* YouTube Summary Modal */}
-      <YouTubeSummary
-        isOpen={showYouTube}
-        onClose={() => setShowYouTube(false)}
-        onSummaryGenerated={handleYouTubeSummary}
-      />
+      {/* YouTube Summary Modal - Lazy loaded */}
+      {showYouTube && (
+        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><div className="animate-spin w-8 h-8 border-2 border-white/20 border-t-white rounded-full" /></div>}>
+          <YouTubeSummary
+            isOpen={showYouTube}
+            onClose={() => setShowYouTube(false)}
+            onSummaryGenerated={handleYouTubeSummary}
+          />
+        </Suspense>
+      )}
 
-      {/* GitHub Analyzer Modal */}
-      <GitHubAnalyzer
-        isOpen={showGitHub}
-        onClose={() => setShowGitHub(false)}
-        onAnalysisGenerated={handleGitHubAnalysis}
-      />
+      {/* GitHub Analyzer Modal - Lazy loaded */}
+      {showGitHub && (
+        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><div className="animate-spin w-8 h-8 border-2 border-white/20 border-t-white rounded-full" /></div>}>
+          <GitHubAnalyzer
+            isOpen={showGitHub}
+            onClose={() => setShowGitHub(false)}
+            onAnalysisGenerated={handleGitHubAnalysis}
+          />
+        </Suspense>
+      )}
 
-      {/* Google Calendar Modal */}
-      <GoogleCalendar
-        isOpen={showCalendar}
-        onClose={() => setShowCalendar(false)}
-        onSendToChat={handleCalendarSendToChat}
-      />
+      {/* Google Calendar Modal - Lazy loaded */}
+      {showCalendar && (
+        <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><div className="animate-spin w-8 h-8 border-2 border-white/20 border-t-white rounded-full" /></div>}>
+          <GoogleCalendar
+            isOpen={showCalendar}
+            onClose={() => setShowCalendar(false)}
+            onSendToChat={handleCalendarSendToChat}
+          />
+        </Suspense>
+      )}
 
       {/* Sidebar */}
       <Sidebar
@@ -637,7 +661,7 @@ export default function ChatPage() {
             <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto pb-4">
               <div className="flex flex-col">
                 {processedMessages.map((message, index) => (
-                  <ChatMessage
+                  <MemoizedChatMessage
                     key={message.id}
                     message={{
                       id: message.id,

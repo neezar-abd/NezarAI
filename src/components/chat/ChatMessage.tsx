@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { User, ThumbsUp, ThumbsDown, RotateCcw, Share, Pencil, Check, X } from "lucide-react";
 import Image from "next/image";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
@@ -213,3 +213,12 @@ export function ChatMessage({
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const MemoizedChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
+  return (
+    prevProps.message.id === nextProps.message.id &&
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.isStreaming === nextProps.isStreaming
+  );
+});
