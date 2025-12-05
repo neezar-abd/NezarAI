@@ -313,17 +313,40 @@ export default function ChatPage() {
     }
 
     const processed = messages.map((msg) => {
-      if (msg.role === "assistant" && msg.content) {
-        const { cleanContent } = parseFollowUpSuggestions(msg.content as string);
+      // Handle content that might be an array (when images are included)
+      let contentStr = "";
+      if (typeof msg.content === "string") {
+        contentStr = msg.content;
+      } else if (Array.isArray(msg.content)) {
+        // Extract text from array content (e.g., [{type: "text", text: "..."}, {type: "image", ...}])
+        contentStr = msg.content
+          .filter((part: any) => part.type === "text")
+          .map((part: any) => part.text)
+          .join("");
+      }
+
+      if (msg.role === "assistant" && contentStr) {
+        const { cleanContent } = parseFollowUpSuggestions(contentStr);
         return { ...msg, content: cleanContent };
       }
-      return { ...msg, content: (msg.content as string) || "" };
+      return { ...msg, content: contentStr };
     });
 
     // Get suggestions from last assistant message
-    const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant" && m.content);
-    const lastSuggestions = lastAssistantMsg
-      ? parseFollowUpSuggestions(lastAssistantMsg.content as string).suggestions
+    const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant");
+    let lastContent = "";
+    if (lastAssistantMsg) {
+      if (typeof lastAssistantMsg.content === "string") {
+        lastContent = lastAssistantMsg.content;
+      } else if (Array.isArray(lastAssistantMsg.content)) {
+        lastContent = lastAssistantMsg.content
+          .filter((part: any) => part.type === "text")
+          .map((part: any) => part.text)
+          .join("");
+      }
+    }
+    const lastSuggestions = lastContent
+      ? parseFollowUpSuggestions(lastContent).suggestions
       : [];
 
     return { processedMessages: processed, suggestions: lastSuggestions };
