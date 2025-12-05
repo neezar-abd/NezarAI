@@ -29,19 +29,24 @@ export function parseFollowUpSuggestions(content: string): {
   cleanContent: string;
   suggestions: string[];
 } {
+  // Regex handles typos: END_SUGGESTIONS, END_SUGESTIONS, END_SUGGESTION, etc.
   const suggestionsMatch = content.match(
-    /---SUGGESTIONS---\s*\n?\s*(\[[\s\S]*?\])\s*\n?\s*---END_SUGGESTIONS---/
+    /---SUGGESTIONS?---\s*\n?\s*(\[[\s\S]*?\])\s*\n?\s*---END_SUGGE?STIONS?---/i
   );
 
   if (suggestionsMatch) {
     try {
       const suggestions = JSON.parse(suggestionsMatch[1]);
       const cleanContent = content
-        .replace(/---SUGGESTIONS---[\s\S]*?---END_SUGGESTIONS---/, "")
+        .replace(/---SUGGESTIONS?---[\s\S]*?---END_SUGGE?STIONS?---/i, "")
         .trim();
       return { cleanContent, suggestions };
     } catch {
-      return { cleanContent: content, suggestions: [] };
+      // If JSON parse fails, still try to clean the content
+      const cleanContent = content
+        .replace(/---SUGGESTIONS?---[\s\S]*?---END_SUGGE?STIONS?---/i, "")
+        .trim();
+      return { cleanContent, suggestions: [] };
     }
   }
 
