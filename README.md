@@ -289,11 +289,25 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 👨‍💻 Author
 
 <p align="center">
-  <img src="https://github.com/neezar-abd.png" width="100" height="100" style="border-radius: 50%;">
+  <img src="https://github.com/neezar-abd.png" width="120" height="120" style="border-radius: 50%;">
+  <br><br>
+  <strong>Neezar Abdurrahman</strong>
   <br>
-  <strong>Neezar</strong>
-  <br>
-  <a href="https://github.com/neezar-abd">@neezar-abd</a>
+  <em>Fullstack Developer & Creative Visual Storyteller</em>
+  <br><br>
+  <a href="https://neezar.tech">
+    <img src="https://img.shields.io/badge/🌐_Portfolio-neezar.tech-000000?style=for-the-badge" alt="Portfolio">
+  </a>
+  <br><br>
+  <a href="https://github.com/neezar-abd">
+    <img src="https://img.shields.io/badge/GitHub-neezar--abd-181717?style=flat-square&logo=github" alt="GitHub">
+  </a>
+  <a href="https://instagram.com/neezar_abd">
+    <img src="https://img.shields.io/badge/Instagram-neezar__abd-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Instagram">
+  </a>
+  <a href="mailto:neezar.tech@gmail.com">
+    <img src="https://img.shields.io/badge/Email-neezar.tech@gmail.com-EA4335?style=flat-square&logo=gmail&logoColor=white" alt="Email">
+  </a>
 </p>
 
 ---
@@ -303,5 +317,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 </p>
 
 <p align="center">
-  Made with ❤️ and ☕ by Neezar
+  Made with ❤️ and ☕ by <a href="https://neezar.tech">Neezar</a>
 </p>
