@@ -312,18 +312,22 @@ export default function ChatPage() {
       return { processedMessages: [], suggestions: [] };
     }
 
-    const processed = messages.map((msg) => {
-      // Handle content that might be an array (when images are included)
-      let contentStr = "";
-      if (typeof msg.content === "string") {
-        contentStr = msg.content;
-      } else if (Array.isArray(msg.content)) {
-        // Extract text from array content (e.g., [{type: "text", text: "..."}, {type: "image", ...}])
-        contentStr = msg.content
-          .filter((part: any) => part.type === "text")
-          .map((part: any) => part.text)
+    // Helper to extract text from message content
+    const extractText = (content: unknown): string => {
+      if (typeof content === "string") {
+        return content;
+      }
+      if (Array.isArray(content)) {
+        return (content as Array<{ type: string; text?: string }>)
+          .filter((part) => part.type === "text" && part.text)
+          .map((part) => part.text || "")
           .join("");
       }
+      return "";
+    };
+
+    const processed = messages.map((msg) => {
+      const contentStr = extractText(msg.content);
 
       if (msg.role === "assistant" && contentStr) {
         const { cleanContent } = parseFollowUpSuggestions(contentStr);
@@ -334,17 +338,7 @@ export default function ChatPage() {
 
     // Get suggestions from last assistant message
     const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant");
-    let lastContent = "";
-    if (lastAssistantMsg) {
-      if (typeof lastAssistantMsg.content === "string") {
-        lastContent = lastAssistantMsg.content;
-      } else if (Array.isArray(lastAssistantMsg.content)) {
-        lastContent = lastAssistantMsg.content
-          .filter((part: any) => part.type === "text")
-          .map((part: any) => part.text)
-          .join("");
-      }
-    }
+    const lastContent = lastAssistantMsg ? extractText(lastAssistantMsg.content) : "";
     const lastSuggestions = lastContent
       ? parseFollowUpSuggestions(lastContent).suggestions
       : [];
