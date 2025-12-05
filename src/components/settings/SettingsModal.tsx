@@ -406,7 +406,7 @@ export function SettingsModal({
                   Hubungi admin untuk mendapatkan kode aktivasi:
                 </p>
                 <p className="text-sm text-[var(--accent)] mt-1">
-                  📧 admin@nezarai.com | 💬 @admin_nezarai
+                  📧 neezar.tech@gmail.com | 📸 @neezar_abd
                 </p>
               </div>
 

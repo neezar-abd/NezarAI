@@ -440,7 +440,7 @@ export default function LandingPage() {
                 </li>
               </ul>
               <a
-                href="mailto:contact@nezarai.com"
+                href="mailto:neezar.tech@gmail.com"
                 className="block w-full py-2.5 sm:py-3 text-center rounded-full border border-white/20 hover:bg-white/5 transition-colors text-sm"
               >
                 Hubungi Sales
