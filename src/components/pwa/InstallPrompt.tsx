@@ -15,6 +15,9 @@ export function InstallPrompt() {
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
+    // Only run in browser
+    if (typeof window === "undefined") return;
+
     // Check if already installed (standalone mode)
     const standalone = window.matchMedia("(display-mode: standalone)").matches;
     setIsStandalone(standalone);
